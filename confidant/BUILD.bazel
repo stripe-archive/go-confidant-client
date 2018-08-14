@@ -1,0 +1,36 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "confidant.go",
+        "credential.go",
+        "grants.go",
+        "request.go",
+        "roles.go",
+        "service.go",
+        "unixproxy.go",
+    ],
+    importpath = "github.com/stripe/go-confidant-client/confidant",
+    visibility = ["//visibility:public"],
+    deps = ["//kmsauth:go_default_library"],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = [
+        "confidant_test.go",
+        "credential_test.go",
+        "example_test.go",
+        "grants_test.go",
+        "request_test.go",
+        "roles_test.go",
+        "service_test.go",
+    ],
+    embed = [":go_default_library"],
+    deps = [
+        "//kmsauth:go_default_library",
+        "@com_github_aws_aws_sdk_go//service/kms:go_default_library",
+        "@com_github_aws_aws_sdk_go//service/kms/kmsiface:go_default_library",
+    ],
+)
