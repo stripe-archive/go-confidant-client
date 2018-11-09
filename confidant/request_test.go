@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -42,6 +43,26 @@ func createHandlerFunc(t *testing.T, expectedUsername string, expectedToken stri
 		if expectedToken != token {
 			t.Errorf("Expected token %s, got %s", expectedToken, token)
 		}
+
+		// Check that we get empty arrays
+		var request RequestBody
+		bodyBytes, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Errorf("Unable read request body: %s", err)
+		}
+		if string(bodyBytes) != "null" {
+			err = json.Unmarshal(bodyBytes, &request)
+			if err != nil {
+				t.Errorf("Unable to unmarshal body: %s", err)
+			}
+			if request.Credentials == nil {
+				t.Errorf("Received nil credentials, wanted empty list")
+			}
+			if request.BlindCredentials == nil {
+				t.Errorf("Received nil blind credentials, wanted empty list")
+			}
+		}
+
 		json.NewEncoder(w).Encode(response)
 	}
 }

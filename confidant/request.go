@@ -17,6 +17,16 @@ type RequestBody struct {
 
 func (c *Client) Request(method string, path string, body *RequestBody, result interface{}) error {
 	url := c.url + path
+
+	if body != nil {
+		// Marshal empty arrays instead of "null".  The Confidant API expects these to be arrays.
+		if body.Credentials == nil {
+			body.Credentials = make([]string, 0)
+		}
+		if body.BlindCredentials == nil {
+			body.BlindCredentials = make([]string, 0)
+		}
+	}
 	requestBody, err := json.Marshal(body)
 	if err != nil {
 		return err
